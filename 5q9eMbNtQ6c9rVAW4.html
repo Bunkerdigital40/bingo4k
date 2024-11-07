@@ -1,0 +1,153 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo 4K</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+        }
+        .bingo-card {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .number {
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            padding: 20px;
+            font-size: 1.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .number.marked {
+            background-color: #28a745;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bingo 4K</h1>
+    <div id="bingo-card" class="bingo-card"></div>
+    <div>
+        <button id="generate-button">Generar tarjeta</button>
+        <button id="play-button">Jugar</button>
+    </div>
+    <h2 id="called-numbers">Números llamados: </h2>
+    <h3 id="winner">Cartón ganador: Ninguno aún</h3>
+    <div id="serial"></div>
+</div>
+
+<script>
+    const bingoCardDiv = document.getElementById('bingo-card');
+    const generateButton = document.getElementById('generate-button');
+    const playButton = document.getElementById('play-button');
+    const calledNumbersDiv = document.getElementById('called-numbers');
+    const winnerDiv = document.getElementById('winner');
+    const serialDiv = document.getElementById('serial');
+    
+    let calledNumbers = [];
+    let bingoCardNumbers = [];
+    let cardSerial = '';
+
+    function generateSerial() {
+        return 'SN-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    }
+
+    function generateBingoCard() {
+        bingoCardDiv.innerHTML = '';
+        bingoCardNumbers = [];
+        let numbers = [];
+        while (numbers.length < 25) {
+            const num = Math.floor(Math.random() * 75) + 1;
+            if (!numbers.includes(num)) {
+                numbers.push(num);
+            }
+        }
+        
+        numbers.forEach(num => {
+            const div = document.createElement('div');
+            div.classList.add('number');
+            div.textContent = num;
+            div.addEventListener('click', () => {
+                div.classList.toggle('marked');
+                if (!calledNumbers.includes(num)) {
+                    calledNumbers.push(num);
+                    updateCalledNumbers();
+                }
+            });
+            bingoCardDiv.appendChild(div);
+            bingoCardNumbers.push(num);
+        });
+
+        cardSerial = generateSerial();
+        serialDiv.textContent = 'Serial: ' + cardSerial;
+    }
+
+    function updateCalledNumbers() {
+        calledNumbersDiv.textContent = 'Números llamados: ' + calledNumbers.join(', ');
+        checkWinner();
+    }
+
+    function callRandomNumber() {
+        if (calledNumbers.length >= 75) return;
+        let num;
+        do {
+            num = Math.floor(Math.random() * 75) + 1;
+        } while (calledNumbers.includes(num));
+        calledNumbers.push(num);
+        updateCalledNumbers();
+    }
+
+    function checkWinner() {
+        const roundWinner = bingoCardNumbers.every(num => calledNumbers.includes(num));
+        if (roundWinner) {
+            winnerDiv.textContent = 'Cartón ganador: ' + cardSerial;
+        }
+    }
+
+    generateButton.addEventListener('click', generateBingoCard);
+    playButton.addEventListener('click', callRandomNumber);
+    
+    generateBingoCard();
+</script>
+
+</body>
+</html>
+```
